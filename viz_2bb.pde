@@ -15,7 +15,7 @@ Visual currentVisual;
 
 void setup() {  
   // ASSUMES VIDEOS ARE IN THE SKETCH DIR
-  BASE_VIDEO_PATH = sketchPath(""); 
+  BASE_VIDEO_PATH = sketchPath("mp4"); 
   
   // MidiBus.list();
   new MidiBus(this, MIDI_IN, 1);
