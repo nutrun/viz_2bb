@@ -11,6 +11,7 @@ import processing.video.*;
 String BASE_VIDEO_PATH;
 String MIDI_IN = "2bb bus";
 HashMap<Character, Visual> visuals = new HashMap<Character, Visual>();
+HashMap<Integer, Character> controlMap = new HashMap<Integer, Character>();
 Visual currentVisual;
 
 void setup() {  
@@ -26,8 +27,16 @@ void setup() {
   visuals.put('4', new HotSummer(this));
   visuals.put('5', new SolutionSarrus(this));
   
-  size(800, 600);
+  controlMap.put(48, '1');
+  controlMap.put(49, '2');
+  controlMap.put(50, '3');
+  controlMap.put(51, '4');
+  controlMap.put(52, '5');
+  controlMap.put(55, '0');
+  
+  size(800, 600, JAVA2D);
   background(128,0,128);
+  frameRate(18);
 }
 
 void draw() {
@@ -39,23 +48,21 @@ void draw() {
   }
 }
 
-void midiMessage(MidiMessage message, long timestamp, String busName) {  
-  if (currentVisual != null) {
-    try {
-      currentVisual.midiMessage(message);
-    } catch (Exception _) {
+void midiMessage(MidiMessage message, long timestamp, String busName) {
+  if((int)(message.getMessage()[0] & 0xFF) == 176) {
+    // catch control messages and use them to pick a song yo.
+    controlCommand(controlMap.get(message.getMessage()[1] & 0xFF));
+  } else {
+    if (currentVisual != null) {
+      try {
+        currentVisual.midiMessage(message);
+      } catch (Exception _) {}
     }
   }
 }
 
-void movieEvent(Movie m) {
-  if (currentVisual != null) {
-    currentVisual.movieEvent(m);
-  }
-}
-
-void keyReleased() {
-  Visual visual = visuals.get(key);
+void controlCommand(Character k){
+  Visual visual = visuals.get(k);
   
   if (visual != null) {
     if (currentVisual != null) {
@@ -68,6 +75,16 @@ void keyReleased() {
       currentVisual.stop();
     }
   }
+}
+
+void movieEvent(Movie m) {
+  if (currentVisual != null) {
+    currentVisual.movieEvent(m);
+  }
+}
+
+void keyReleased() {
+  controlCommand(key);
 }
 
 abstract class Visual {
