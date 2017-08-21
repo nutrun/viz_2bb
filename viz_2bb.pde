@@ -63,6 +63,10 @@ void keyReleased() {
     }
     currentVisual = visual;
     currentVisual.loopMovie();
+  } else {
+    if (currentVisual != null) {
+      currentVisual.stop();
+    }
   }
 }
 
