@@ -14,10 +14,10 @@ HashMap<Character, Visual> visuals = new HashMap<Character, Visual>();
 HashMap<Integer, Character> controlMap = new HashMap<Integer, Character>();
 Visual currentVisual;
 
-void setup() {  
+void setup() {
   // ASSUMES VIDEOS ARE IN THE SKETCH DIR
-  BASE_VIDEO_PATH = sketchPath("mp4"); 
-  
+  BASE_VIDEO_PATH = sketchPath("mp4");
+
   // MidiBus.list();
   new MidiBus(this, MIDI_IN, 1);
 
@@ -26,14 +26,16 @@ void setup() {
   visuals.put('3', new BeastsBreath(this));
   visuals.put('4', new HotSummer(this));
   visuals.put('5', new SolutionSarrus(this));
-  
+  visuals.put('6', new DeadMansLullaby(this));
+
   controlMap.put(48, '1');
   controlMap.put(49, '2');
   controlMap.put(50, '3');
   controlMap.put(51, '4');
   controlMap.put(52, '5');
+  controlMap.put(53, '6');
   controlMap.put(55, '0');
-  
+
   size(800, 600, JAVA2D);
   background(128,0,128);
   frameRate(18);
@@ -63,7 +65,7 @@ void midiMessage(MidiMessage message, long timestamp, String busName) {
 
 void controlCommand(Character k){
   Visual visual = visuals.get(k);
-  
+
   if (visual != null) {
     if (currentVisual != null) {
       currentVisual.stop();
@@ -89,33 +91,33 @@ void keyReleased() {
 
 abstract class Visual {
   PApplet parent;
-  Movie movie; 
+  Movie movie;
   MidiBus midiBus;
   int sequencerNote = 0;
   String moviePath;
 
   abstract void draw();
-  
+
   Visual(PApplet parent, String moviePath) {
     this.parent = parent;
     this.movie = new Movie(this.parent, BASE_VIDEO_PATH + moviePath);
   }
-  
+
   void loopMovie() {
     this.movie.loop();
   }
-  
+
   void stop() {
     this.movie.stop();
   }
-  
+
   void movieEvent(Movie m) {
     // m.volume(0);
     m.read();
   }
-  
+
   void midiMessage(MidiMessage message) {
-    //println("Note: " + (int)(message.getMessage()[1] & 0xFF) + 
+    //println("Note: " + (int)(message.getMessage()[1] & 0xFF) +
     //        " Velocity: " + (int)(message.getMessage()[2] & 0xFF));
     this.sequencerNote = (int)(message.getMessage()[1] & 0xFF);
   }
@@ -124,11 +126,11 @@ abstract class Visual {
 
 
 class FiendForSleep extends Visual {
-  
+
   FiendForSleep(PApplet parent) {
-    super(parent, "/fiend_for_sleep_800.mp4");    
+    super(parent, "/fiend_for_sleep_800.mp4");
   }
-  
+
   void draw() {
     if (movie != null) {
       image(this.movie, 0, 0, this.movie.width, this.movie.height);
@@ -148,11 +150,11 @@ class FollowYouHome extends Visual {
   FollowYouHome(PApplet parent) {
     super(parent, "/follow_you_home_800.mp4");
   }
-  
+
   void draw() {
     if (movie != null) {
       image(movie, 0, 0, movie.width, movie.height);
-    
+
       if (sequencerNote == 61) {
         filter(INVERT);
         filter(POSTERIZE, 4);
@@ -167,12 +169,12 @@ class FollowYouHome extends Visual {
 class BeastsBreath extends Visual {
   PImage img;
   int brightnessAdjust = 0;
-  
+
   BeastsBreath(PApplet parent) {
     super(parent, "/beasts_breath_800.mp4");
     this.img = createImage(parent.width, parent.height, RGB);
   }
-  
+
   private void adjustBrightness() {
     if (img != null && brightnessAdjust != 0) {
       for (int x = 0; x < img.width; x++) {
@@ -190,10 +192,10 @@ class BeastsBreath extends Visual {
       image(movie, 0, 0);
     }
   }
-  
+
   private void distort() {
     loadPixels();
-  
+
     int randPos = 0;
     if (frameCount  % 100 == 0) {
       randPos = (int)random(0, this.movie.height -4);
@@ -211,12 +213,12 @@ class BeastsBreath extends Visual {
         if (frameCount % 50 == 0) {
           randPosY = (int)random(20, 50);
         }
-        
+
         for (int x = 0; x < this.movie.width; x++) {
           if (frameCount % 100 == 0) {
             randPosY = (int)random(20, 50);
           }
-          
+
           if (y < movie.height -4) {
             pixels[x + (y + 0 + randPosY)* width] = this.img.pixels[(y + 0 ) * this.movie.width + randPos + x];
             pixels[x + (y + 1 + randPosY) * width] = this.img.pixels[(y + 1) * this.movie.width + randPos + 1 + x];
@@ -235,7 +237,7 @@ class BeastsBreath extends Visual {
     }
     updatePixels();
   }
-  
+
   void draw() {
     if (this.sequencerNote == 61) {
       distort();
@@ -249,7 +251,7 @@ class BeastsBreath extends Visual {
       adjustBrightness();
     }
   }
-  
+
   void movieEvent(Movie m) {
     m.read();
     this.img = createImage(width, height, RGB);
@@ -269,52 +271,52 @@ class HotSummer extends Visual {
     super(parent, "/hot_summer_800.mp4");
     this.targetMovie = new Movie(this.parent, BASE_VIDEO_PATH + "/hot_summer_800.mp4");
   }
-  
+
   void loopMovie() {
     this.movie.loop();
     this.targetMovie.loop();
   }
-  
+
   void stop() {
     this.movie.stop();
     this.targetMovie.stop();
   }
-  
+
   void draw() {
     if (sequencerNote == 61) {
       this.movie.loadPixels();
       targetMovie.loadPixels();
-  
+
       for(int i = 0;i < iterations;i++) {
         int sourceChannel = int(random(3));
         int targetChannel = int(random(3));
-  
+
         int horizontalShift = 0;
-  
+
         if(shiftHorizontally)
           horizontalShift = int(random(targetMovie.width));
-  
+
         int verticalShift = 0;
-  
+
         if(shiftVertically) {
           verticalShift = int(random(targetMovie.height));
         }
-  
+
         copyChannel(this.movie.pixels, targetMovie.pixels, verticalShift, horizontalShift, sourceChannel, targetChannel);
-  
+
         if(recursiveIterations) {
           this.movie.pixels = targetMovie.pixels;
         }
       }
-  
+
       targetMovie.updatePixels();
-  
+
       image(targetMovie, 0, 0);
     } else {
       image(this.movie, 0, 0);
     }
   }
-  
+
   private void copyChannel(color[] sourcePixels, color[] targetPixels, int sourceY, int sourceX, int sourceChannel, int targetChannel) {
     for(int y = 0; y < targetMovie.height; y++) {
       int sourceYOffset = sourceY + y;
@@ -329,7 +331,7 @@ class HotSummer extends Visual {
         if(sourceXOffset >= targetMovie.width) {
           sourceXOffset -= targetMovie.width;
         }
-        
+
         color sourcePixel = sourcePixels[sourceYOffset * targetMovie.width + sourceXOffset];
         float sourceRed = red(sourcePixel);
         float sourceGreen = green(sourcePixel);
@@ -373,16 +375,16 @@ class SolutionSarrus extends Visual {
   final color GLITCH_COLOR = color(77, 0, 0, 255);
   int jumpCount = 0;
   int currTime = 0;
-  
+
   SolutionSarrus(PApplet parent) {
     super(parent, "/solution_sarrus_800.mp4");
   }
-  
+
   void draw() {
     if (movie != null) {
       if (sequencerNote == 61) {
         boolean previousPixelGlitched = false;
-        
+
         for (int x = 0; x < movie.width; x++) {
           for (int y = 0; y < movie.height; y++) {
             if (random(100) < 25 || (previousPixelGlitched == true && random(100) < 80)) {
@@ -397,12 +399,12 @@ class SolutionSarrus extends Visual {
         }
         updatePixels();
       }
-      
+
       image(this.movie, 0, 0, this.movie.width, this.movie.height);
-      
+
       // Loop current 3 seconds REPEATS times
       int t = (int) round(movie.time());
-      
+
       if ((t != 0) && (t != this.currTime)) {
         if ((t % 3) == 0) {
           if (jumpCount == REPEATS) {
@@ -411,9 +413,24 @@ class SolutionSarrus extends Visual {
             movie.jump(t - 2);
             jumpCount++;
           }
-        }      
+        }
       }
       this.currTime = t;
     }
+  }
+}
+
+class DeadMansLullaby extends Visual {
+  final int REPEATS = 5;
+  final color GLITCH_COLOR = color(77, 0, 0, 255);
+  int jumpCount = 0;
+  int currTime = 0;
+
+  DeadMansLullaby(PApplet parent) {
+    super(parent, "/dead_mans_lullaby_800.mp4");
+  }
+
+void draw() {
+    image(this.movie, 0, 0, this.movie.width, this.movie.height);
   }
 }
