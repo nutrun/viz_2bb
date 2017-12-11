@@ -27,6 +27,7 @@ void setup() {
   visuals.put('4', new HotSummer(this));
   visuals.put('5', new SolutionSarrus(this));
   visuals.put('6', new DeadMansLullaby(this));
+  visuals.put('7', new MysteriesOfLove(this));
 
   controlMap.put(48, '1');
   controlMap.put(49, '2');
@@ -34,6 +35,7 @@ void setup() {
   controlMap.put(51, '4');
   controlMap.put(52, '5');
   controlMap.put(53, '6');
+  controlMap.put(54, '7');
   controlMap.put(55, '0');
 
   size(800, 600, JAVA2D);
@@ -421,16 +423,21 @@ class SolutionSarrus extends Visual {
 }
 
 class DeadMansLullaby extends Visual {
-  final int REPEATS = 5;
-  final color GLITCH_COLOR = color(77, 0, 0, 255);
-  int jumpCount = 0;
-  int currTime = 0;
-
   DeadMansLullaby(PApplet parent) {
     super(parent, "/dead_mans_lullaby_800.mp4");
   }
 
-void draw() {
+  void draw() {
+    image(this.movie, 0, 0, this.movie.width, this.movie.height);
+  }
+}
+
+class MysteriesOfLove extends Visual {
+  MysteriesOfLove(PApplet parent) {
+    super(parent, "/mysteries_of_love_800.mp4");
+  }
+
+  void draw() {
     image(this.movie, 0, 0, this.movie.width, this.movie.height);
   }
 }
