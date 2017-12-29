@@ -39,7 +39,7 @@ void setup() {
   controlMap.put(55, '0');
 
   size(800, 600, JAVA2D);
-  background(128,0,128);
+  background(128, 0, 128);
   frameRate(18);
 }
 
@@ -47,25 +47,28 @@ void draw() {
   if (currentVisual != null) {
     try {
       currentVisual.draw();
-    } catch (Exception _) {
+    } 
+    catch (Exception _) {
     }
   }
 }
 
 void midiMessage(MidiMessage message, long timestamp, String busName) {
-  if((int)(message.getMessage()[0] & 0xFF) == 176) {
+  if ((int)(message.getMessage()[0] & 0xFF) == 176) {
     // catch control messages and use them to pick a song yo.
     controlCommand(controlMap.get(message.getMessage()[1] & 0xFF));
   } else {
     if (currentVisual != null) {
       try {
         currentVisual.midiMessage(message);
-      } catch (Exception _) {}
+      } 
+      catch (Exception _) {
+      }
     }
   }
 }
 
-void controlCommand(Character k){
+void controlCommand(Character k) {
   Visual visual = visuals.get(k);
 
   if (visual != null) {
@@ -114,7 +117,6 @@ abstract class Visual {
   }
 
   void movieEvent(Movie m) {
-    // m.volume(0);
     m.read();
   }
 
@@ -289,24 +291,24 @@ class HotSummer extends Visual {
       this.movie.loadPixels();
       targetMovie.loadPixels();
 
-      for(int i = 0;i < iterations;i++) {
+      for (int i = 0; i < iterations; i++) {
         int sourceChannel = int(random(3));
         int targetChannel = int(random(3));
 
         int horizontalShift = 0;
 
-        if(shiftHorizontally)
+        if (shiftHorizontally)
           horizontalShift = int(random(targetMovie.width));
 
         int verticalShift = 0;
 
-        if(shiftVertically) {
+        if (shiftVertically) {
           verticalShift = int(random(targetMovie.height));
         }
 
         copyChannel(this.movie.pixels, targetMovie.pixels, verticalShift, horizontalShift, sourceChannel, targetChannel);
 
-        if(recursiveIterations) {
+        if (recursiveIterations) {
           this.movie.pixels = targetMovie.pixels;
         }
       }
@@ -320,17 +322,17 @@ class HotSummer extends Visual {
   }
 
   private void copyChannel(color[] sourcePixels, color[] targetPixels, int sourceY, int sourceX, int sourceChannel, int targetChannel) {
-    for(int y = 0; y < targetMovie.height; y++) {
+    for (int y = 0; y < targetMovie.height; y++) {
       int sourceYOffset = sourceY + y;
 
-      if(sourceYOffset >= targetMovie.height) {
+      if (sourceYOffset >= targetMovie.height) {
         sourceYOffset -= targetMovie.height;
       }
 
-      for(int x = 0; x < targetMovie.width; x++) {
+      for (int x = 0; x < targetMovie.width; x++) {
         int sourceXOffset = sourceX + x;
 
-        if(sourceXOffset >= targetMovie.width) {
+        if (sourceXOffset >= targetMovie.width) {
           sourceXOffset -= targetMovie.width;
         }
 
@@ -345,27 +347,27 @@ class HotSummer extends Visual {
         float sourceChannelValue = 0;
 
         switch(sourceChannel) {
-          case 0:
-            sourceChannelValue = sourceRed;
-            break;
-          case 1:
-            sourceChannelValue = sourceGreen;
-            break;
-          case 2:
-            sourceChannelValue = sourceBlue;
-            break;
+        case 0:
+          sourceChannelValue = sourceRed;
+          break;
+        case 1:
+          sourceChannelValue = sourceGreen;
+          break;
+        case 2:
+          sourceChannelValue = sourceBlue;
+          break;
         }
 
         switch(targetChannel) {
-          case 0:
-            targetPixels[y * targetMovie.width + x] =  color(sourceChannelValue, targetGreen, targetBlue);
-            break;
-          case 1:
-            targetPixels[y * targetMovie.width + x] =  color(targetRed, sourceChannelValue, targetBlue);
-            break;
-          case 2:
-            targetPixels[y * targetMovie.width + x] =  color(targetRed, targetGreen, sourceChannelValue);
-            break;
+        case 0:
+          targetPixels[y * targetMovie.width + x] =  color(sourceChannelValue, targetGreen, targetBlue);
+          break;
+        case 1:
+          targetPixels[y * targetMovie.width + x] =  color(targetRed, sourceChannelValue, targetBlue);
+          break;
+        case 2:
+          targetPixels[y * targetMovie.width + x] =  color(targetRed, targetGreen, sourceChannelValue);
+          break;
         }
       }
     }
@@ -433,11 +435,39 @@ class DeadMansLullaby extends Visual {
 }
 
 class MysteriesOfLove extends Visual {
+  int tintAdjust = 0;
+  boolean videoSpeedSet = false;
+
   MysteriesOfLove(PApplet parent) {
     super(parent, "/mysteries_of_love_800.mp4");
   }
 
   void draw() {
-    image(this.movie, 0, 0, this.movie.width, this.movie.height);
+    if (movie.available()) {
+      if (!videoSpeedSet) {
+        movie.speed(0.25);
+        videoSpeedSet = true;
+      }
+      
+      movie.read();
+    }
+    
+    if (this.sequencerNote == 61) {
+      this.tintAdjust -= 10;
+    } else {
+      if (this.tintAdjust != 255) {
+        this.tintAdjust = 255;
+      }
+    }
+
+    tint(constrain(this.tintAdjust, 0, 255), 
+      constrain(this.tintAdjust, 0, 255), 
+      constrain(this.tintAdjust, 0, 255), 
+      128);
+    image(this.movie, 0, 0);
+  }
+  
+  // override this to set movie speed in draw()
+  void movieEvent(Movie m) {
   }
 }
