@@ -40,7 +40,6 @@ void setup() {
   controlMap.put(55, '0');
 
   size(800, 600, JAVA2D);
-  background(128, 0, 128);
   frameRate(18);
 }
 
@@ -51,6 +50,10 @@ void draw() {
     } 
     catch (Exception _) {
     }
+  } else {
+    // No visual, paint screen purple
+    clear();
+    background(128, 0, 128);
   }
 }
 
@@ -81,6 +84,8 @@ void controlCommand(Character k) {
   } else {
     if (currentVisual != null) {
       currentVisual.stop();
+      // Clear current visual to blank the screen when playback is stopped
+      currentVisual = null;
     }
   }
 }
