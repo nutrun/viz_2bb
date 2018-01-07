@@ -15,6 +15,7 @@ HashMap<Integer, Character> controlMap = new HashMap<Integer, Character>();
 Visual currentVisual;
 
 void setup() {
+  noCursor();
   // ASSUMES VIDEOS ARE IN THE SKETCH DIR
   BASE_VIDEO_PATH = sketchPath("mp4");
 
@@ -24,10 +25,10 @@ void setup() {
   visuals.put('1', new FiendForSleep(this));
   visuals.put('2', new FollowYouHome(this));
   visuals.put('3', new BeastsBreath(this));
-  visuals.put('4', new HotSummer(this));
+  visuals.put('4', new MysteriesOfLove(this));
   visuals.put('5', new SolutionSarrus(this));
   visuals.put('6', new DeadMansLullaby(this));
-  visuals.put('7', new MysteriesOfLove(this));
+  visuals.put('7', new HotSummer(this));
 
   controlMap.put(48, '1');
   controlMap.put(49, '2');
