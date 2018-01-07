@@ -375,63 +375,35 @@ class HotSummer extends Visual {
   }
 }
 
-class SolutionSarrus extends Visual {
-  final int REPEATS = 5;
-  final color GLITCH_COLOR = color(77, 0, 0, 255);
-  int jumpCount = 0;
-  int currTime = 0;
-
-  SolutionSarrus(PApplet parent) {
-    super(parent, "/solution_sarrus_800.mp4");
-  }
-
-  void draw() {
-    if (movie != null) {
-      if (sequencerNote == 61) {
-        boolean previousPixelGlitched = false;
-
-        for (int x = 0; x < movie.width; x++) {
-          for (int y = 0; y < movie.height; y++) {
-            if (random(100) < 25 || (previousPixelGlitched == true && random(100) < 80)) {
-              previousPixelGlitched = true;
-              color pixelColor = movie.pixels[y + x * movie.height];
-              float mixPercentage = .5 + random(50)/100;
-              movie.pixels[y + x * movie.height] =  lerpColor(pixelColor, GLITCH_COLOR, mixPercentage);
-            } else {
-              previousPixelGlitched = false;
-            }
-          }
-        }
-        updatePixels();
-      }
-
-      image(this.movie, 0, 0, this.movie.width, this.movie.height);
-
-      // Loop current 3 seconds REPEATS times
-      int t = (int) round(movie.time());
-
-      if ((t != 0) && (t != this.currTime)) {
-        if ((t % 3) == 0) {
-          if (jumpCount == REPEATS) {
-            jumpCount = 0;
-          } else {
-            movie.jump(t - 2);
-            jumpCount++;
-          }
-        }
-      }
-      this.currTime = t;
-    }
-  }
-}
-
 class DeadMansLullaby extends Visual {
+  final int blockSize = 5;
+  final int numPixelsWide = width / blockSize;
+  final int numPixelsHigh = height / blockSize;
+  final color movColors[] = new color[numPixelsWide * numPixelsHigh];
+    
   DeadMansLullaby(PApplet parent) {
     super(parent, "/dead_mans_lullaby_800.mp4");
   }
 
   void draw() {
-    image(this.movie, 0, 0, this.movie.width, this.movie.height);
+    if (this.sequencerNote == 61) {
+      int count = 0;
+      for (int j = 0; j < numPixelsHigh; j++) {
+        for (int i = 0; i < numPixelsWide; i++) {
+          movColors[count] = this.movie.get(i*blockSize, j*blockSize);
+          count++;
+        }
+      }
+      background(255);
+      for (int j = 0; j < numPixelsHigh; j++) {
+        for (int i = 0; i < numPixelsWide; i++) {
+          fill(movColors[j*numPixelsWide + i]);
+          rect(i*blockSize, j*blockSize, blockSize, blockSize);
+        }
+      }
+    } else {
+      image(this.movie, 0, 0, this.movie.width, this.movie.height);  
+    }
   }
 }
 
