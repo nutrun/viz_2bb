@@ -431,12 +431,43 @@ class SolutionSarrus extends Visual {
 }
 
 class DeadMansLullaby extends Visual {
+  final int blockSize = 5;
+  final int numPixelsWide = width / blockSize;
+  final int numPixelsHigh = height / blockSize;
+  final color movColors[] = new color[numPixelsWide * numPixelsHigh];
+    
   DeadMansLullaby(PApplet parent) {
     super(parent, "/dead_mans_lullaby_800.mp4");
   }
 
   void draw() {
-    image(this.movie, 0, 0, this.movie.width, this.movie.height);
+    if (this.sequencerNote == 61) {
+      int count = 0;
+      for (int j = 0; j < numPixelsHigh; j++) {
+        for (int i = 0; i < numPixelsWide; i++) {
+          movColors[count] = this.movie.get(i*blockSize, j*blockSize);
+          count++;
+        }
+      }
+      background(255);
+      for (int j = 0; j < numPixelsHigh; j++) {
+        for (int i = 0; i < numPixelsWide; i++) {
+          fill(movColors[j*numPixelsWide + i]);
+          rect(i*blockSize, j*blockSize, blockSize, blockSize);
+        }
+      }
+      
+      int chance = (int)random(0, 10);
+      
+      println(chance);
+      
+      switch(chance) {
+        case 0: filter(POSTERIZE, 4);
+        case 1: filter(INVERT);
+      }
+    } else {
+      image(this.movie, 0, 0, this.movie.width, this.movie.height);  
+    }
   }
 }
 
