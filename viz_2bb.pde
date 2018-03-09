@@ -26,12 +26,13 @@ void setup() {
 
   visuals.put('1', new FiendForSleep(this));
   visuals.put('2', new FollowYouHome(this));
-  visuals.put('3', new BeastsBreath(this));
-  visuals.put('4', new MysteriesOfLove(this));
-  visuals.put('5', new MeowMix(this));
-  visuals.put('6', new SolutionSarrus(this));
-  visuals.put('7', new DeadMansLullaby(this));
-  visuals.put('8', new HotSummer(this));
+  visuals.put('3', new Zagadka(this));
+  visuals.put('4', new BeastsBreath(this));
+  visuals.put('5', new MysteriesOfLove(this));
+  visuals.put('6', new MeowMix(this));
+  visuals.put('7', new SolutionSarrus(this));
+  visuals.put('8', new DeadMansLullaby(this));
+  visuals.put('9', new HotSummer(this));
 
   controlMap.put(48, '1');
   controlMap.put(49, '2');
@@ -543,5 +544,21 @@ class MeowMix extends Visual {
       image(img0, 0, 0);
       img0.resize(width, height); 
     }
+  }  
+}
+
+class Zagadka extends Visual {
+  
+  Zagadka(PApplet parent) {
+    super(parent, "/zagadka_800.mp4");
+  }
+
+  void draw() {
+    if (this.sequencerNote == 61) {
+      tint(random(0, 255), random(0, 255));
+    } else if (this.sequencerNote == 62) {
+      filter(INVERT);
+    }
+    image(this.movie, 0, 0);
   }  
 }
