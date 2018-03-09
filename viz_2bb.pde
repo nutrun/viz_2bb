@@ -9,6 +9,7 @@ import javax.sound.midi.MidiMessage;
 import processing.video.*;
 
 String BASE_VIDEO_PATH;
+String BASE_IMG_PATH;
 String MIDI_IN = "2bb bus";
 HashMap<Character, Visual> visuals = new HashMap<Character, Visual>();
 HashMap<Integer, Character> controlMap = new HashMap<Integer, Character>();
@@ -18,6 +19,7 @@ void setup() {
   noCursor();
   // ASSUMES VIDEOS ARE IN THE SKETCH DIR
   BASE_VIDEO_PATH = sketchPath("mp4");
+  BASE_IMG_PATH = sketchPath("img");
 
   // MidiBus.list();
   new MidiBus(this, MIDI_IN, 1);
@@ -26,9 +28,10 @@ void setup() {
   visuals.put('2', new FollowYouHome(this));
   visuals.put('3', new BeastsBreath(this));
   visuals.put('4', new MysteriesOfLove(this));
-  visuals.put('5', new SolutionSarrus(this));
-  visuals.put('6', new DeadMansLullaby(this));
-  visuals.put('7', new HotSummer(this));
+  visuals.put('5', new MeowMix(this));
+  visuals.put('6', new SolutionSarrus(this));
+  visuals.put('7', new DeadMansLullaby(this));
+  visuals.put('8', new HotSummer(this));
 
   controlMap.put(48, '1');
   controlMap.put(49, '2');
@@ -510,4 +513,35 @@ class MysteriesOfLove extends Visual {
   // override this to set movie speed in draw()
   void movieEvent(Movie m) {
   }
+}
+
+class MeowMix extends Visual {
+  PImage img0;
+  PImage img1;
+  PImage img2;
+  
+  MeowMix(PApplet parent) {
+    super(parent, "/meow_mix_800.mp4");
+    img0 = loadImage(BASE_IMG_PATH + "/meow_mix_0.png");
+    img1 = loadImage(BASE_IMG_PATH + "/meow_mix_1.png");
+    img2 = loadImage(BASE_IMG_PATH + "/meow_mix_2.png");
+  }
+
+  void draw() {
+    image(this.movie, 0, 0);
+    if (this.sequencerNote == 61) {
+      tint(255, 64);
+      filter(INVERT);
+      image(img1, 0, 0);
+      img1.resize(width, height);
+    } else if (this.sequencerNote == 62) {
+      tint(255, 64);
+      image(img1, 0, 0);
+      img0.resize(width, height);
+    } else if (this.sequencerNote == 63) {
+      tint(255, 64);
+      image(img0, 0, 0);
+      img0.resize(width, height); 
+    }
+  }  
 }
