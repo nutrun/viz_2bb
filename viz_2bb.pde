@@ -24,24 +24,26 @@ void setup() {
   // MidiBus.list();
   new MidiBus(this, MIDI_IN, 1);
 
-  visuals.put('1', new FiendForSleep(this));
-  visuals.put('2', new FollowYouHome(this));
-  visuals.put('3', new Zagadka(this));
-  visuals.put('4', new BeastsBreath(this));
-  visuals.put('5', new MysteriesOfLove(this));
-  visuals.put('6', new MeowMix(this));
-  visuals.put('7', new SolutionSarrus(this));
-  visuals.put('8', new DeadMansLullaby(this));
-  visuals.put('9', new HotSummer(this));
+  visuals.put('q', new FiendForSleep(this));
+  visuals.put('w', new FollowYouHome(this));
+  visuals.put('e', new Zagadka(this));
+  visuals.put('r', new BeastsBreath(this));
+  visuals.put('t', new MysteriesOfLove(this));
+  visuals.put('y', new MeowMix(this));
+  visuals.put('u', new SolutionSarrus(this));
+  visuals.put('i', new DeadMansLullaby(this));
+  visuals.put('o', new HotSummer(this));
+  visuals.put('p', new Chopperfuck(this));
 
-  controlMap.put(48, '1');
-  controlMap.put(49, '2');
-  controlMap.put(50, '3');
-  controlMap.put(51, '4');
-  controlMap.put(52, '5');
-  controlMap.put(53, '6');
-  controlMap.put(54, '7');
-  controlMap.put(55, '0');
+  // FIXME: Need to be updated 
+  //controlMap.put(48, '1');
+  //controlMap.put(49, '2');
+  //controlMap.put(50, '3');
+  //controlMap.put(51, '4');
+  //controlMap.put(52, '5');
+  //controlMap.put(53, '6');
+  //controlMap.put(54, '7');
+  //controlMap.put(55, '0');
 
   size(800, 600, JAVA2D);
   frameRate(18);
@@ -525,7 +527,6 @@ class MeowMix extends Visual {
     super(parent, "/meow_mix_800.mp4");
     img0 = loadImage(BASE_IMG_PATH + "/meow_mix_0.png");
     img1 = loadImage(BASE_IMG_PATH + "/meow_mix_1.png");
-    img2 = loadImage(BASE_IMG_PATH + "/meow_mix_2.png");
   }
 
   void draw() {
@@ -561,4 +562,103 @@ class Zagadka extends Visual {
     }
     image(this.movie, 0, 0);
   }  
+}
+
+class Chopperfuck extends Visual {
+  boolean mode = true; // true for left, false for right
+  boolean do_blend = false;
+  int blend_mode = OVERLAY;
+  PGraphics buffer;
+  int len;
+  float random_point = 0.5;
+
+  Chopperfuck(PApplet parent) {
+    super(parent, "/chopperfuck_800.mp4");
+    
+    buffer = createGraphics(width, height);
+    buffer.smooth(8);
+    buffer.beginDraw();
+    buffer.noStroke();
+    buffer.background(0);
+    buffer.image(movie,0,0);
+    buffer.endDraw();
+    len = width * height;
+  }
+  
+  void draw() {
+    image(this.movie, 0, 0);
+    
+    if (this.sequencerNote == 61) {
+      float x = 0.14;
+      float y = 0.95;
+      random_point = random(0.1,0.9);
+      int vall = (int) map(x * y, 0, 1, 1, len-1);
+      processImage(vall);
+    } else if (this.sequencerNote == 62) {
+      filter(GRAY);
+    } else if (this.sequencerNote == 63) {
+      filter(INVERT);
+    }
+  }
+  
+  void processImage(int v) {
+    buffer.beginDraw();
+    buffer.image(movie,0,0);  
+    buffer.endDraw();
+  
+    buffer.loadPixels();
+    
+    int x = 0;
+    while(x<len) {
+      if(x+v<len) quicksort(buffer.pixels, x, x+v);
+      else quicksort(buffer.pixels, x, len-1);
+      x+=v;
+    }
+    
+    buffer.updatePixels();
+    
+    if(do_blend) {
+      buffer.beginDraw();
+      buffer.blend(movie, 0, 0, movie.width, movie.height, 0, 0, buffer.width, buffer.height, blend_mode);
+      buffer.endDraw();
+    }
+      
+    image(buffer,0,0,width,height);
+  }
+  
+  int partition(int x[], int left, int right) {
+    int i = left;
+    int j = right;
+    int temp;
+    int pivot = x [(int)map(random_point,0,1,left,right)];
+    while (i<= j) {
+      while(x[i] < pivot) {
+        i++;
+      }
+      while (x[j] > pivot) {
+        j--;
+      }
+      if (i <= j) {
+        temp = x[i];
+        x[i] = x [j];
+        x[j] = temp;
+        i++;
+        j--;
+      }
+    }
+    return i;
+  }
+  
+  void quicksort(int x[], int left, int right) {
+    if(left<right) {
+      int index = partition(x, left, right);
+      if(mode) {
+        if(left < index-1) quicksort(x, left, index-1);
+        if(right < index) quicksort(x, index, right);
+      } else {
+        if(left > index-1) quicksort(x, left, index-1);
+        if(right > index) quicksort(x, index, right);
+      }
+    }
+  }
 }
